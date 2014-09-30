@@ -64,15 +64,15 @@ public class Segment : MonoBehaviour {
 
 		public void buildMesh(){
 						
-				Mesh m = GetComponent<MeshFilter> ().sharedMesh;
+//				Mesh m = GetComponent<MeshFilter> ().sharedMesh;
 
 //						if(m.vertices.Length!=8){
 //						print ("mesh not valid"+m.vertices.Length);
 //								return;
 //								}
 
-				GetComponent<MeshFilter> ().sharedMesh = Utils.Utils.arc(rin,rout,new Vector2(begin,end)*360.0f/audio.totalLength- Vector2.up*_padAngle,thick);
-				transform.localPosition = Vector3.zero;
+				//GetComponent<MeshFilter> ().sharedMesh = Utils.Utils.arc(rin,rout,new Vector2(begin,end)*360.0f/audio.totalLength- Vector2.up*_padAngle,thick);
+				//transform.localPosition = Vector3.zero;
 				GetComponent<MeshCollider> ().sharedMesh = GetComponent<MeshFilter> ().sharedMesh;
 //						transform.Rotate (0, 0, 360.0f * begin/  audio.audio.clip.length);
 

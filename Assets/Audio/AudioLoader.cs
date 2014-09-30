@@ -40,7 +40,7 @@ public class AudioLoader : MonoBehaviour {
 				}
 				assL = new List<audioSlicer> ();
 				int idx = 0;
-				int maxnum = 400;
+				int maxnum = 10;
 				int numinst = Mathf.Min (maxnum, dict.Count);
 				float gridsize=5;
 				float side = gridsize / (Mathf.Sqrt (numinst));
@@ -61,6 +61,23 @@ public class AudioLoader : MonoBehaviour {
 								idx ++;
 						if (idx >= maxnum) break;
 				}
+
+		foreach (audioSlicer ass in assL)
+				{
+
+						for (int i = 0; i < 1; i++) {
+								GameObject go = new GameObject ();
+								go.name = "spring" + i;
+								//go.transform.parent = ass.transform.parent;
+								go.AddComponent<Rigidbody> ();
+								SpringJoint sj = go.AddComponent<SpringJoint> ();
+								sj.connectedBody = assL [Random.Range (0, assL.Count - 1)].transform.parent.rigidbody;
+						
+								FixedJoint fj = go.AddComponent<FixedJoint> ();
+								fj.connectedBody = ass.transform.parent.rigidbody;
+						}
+				}
+
 				lastMP = Input.mousePosition;
 
 

@@ -116,6 +116,7 @@ public class audioSlicer : MonoBehaviour {
 						obj.transform.parent = transform.parent.FindChild("Segments");
 //						Segment s = obj.GetComponent<Segment> ();
 						Segment s = obj.AddComponent<Segment> ();// new Segment(audioSource,instants [i - 1], instants [i]));
+						obj.transform.localPosition = Utils.Utils.circle (i, instants.Count,.15f);
 						s.begin = instants [i].x;
 						s.end = instants [i].y;
 						s.audio = this;
