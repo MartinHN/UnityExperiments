@@ -19,8 +19,11 @@ public class Segment : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-				audio = transform.parent.parent.GetComponentInChildren<audioSlicer> ();
+				audio = transform.parent.GetComponent<audioSlicer> ();
 				isPlaying = false;
+
+				gameObject.layer = LayerMask.NameToLayer ("Segments");
+
 				//buildMesh ();
 	
 	}
@@ -31,7 +34,7 @@ public class Segment : MonoBehaviour {
 	}
 		void OnMouseDown(){
 
-
+				print ("click");
 
 				if (audio.playingSegment!=null && audio.playingSegment.idx == this.idx)
 						audio.playingSegment = null;
@@ -39,6 +42,13 @@ public class Segment : MonoBehaviour {
 						audio.playingSegment = this;
 				//isPlaying = !isPlaying;
 
+		}
+
+		public void clickAction(){
+				if (audio.playingSegment!=null && audio.playingSegment.idx == this.idx)
+						audio.playingSegment = null;
+				else
+						audio.playingSegment = this;
 		}
 
 		public bool isPlaying{

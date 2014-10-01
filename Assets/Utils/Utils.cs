@@ -75,7 +75,7 @@ namespace Utils{
 				}
 				public static Vector3 grid(int idx,int total,float size){
 						int num =(int) Mathf.Sqrt (total);
-						float step = size/(num-1);
+						float step = size/(num);
 
 						return Vector3.left * ((idx/num-(num-1)/2.0f)*step) + Vector3.up * step* ((idx % num)-(num-1)/2.0f);
 				}

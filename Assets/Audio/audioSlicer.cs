@@ -112,11 +112,10 @@ public class audioSlicer : MonoBehaviour {
 		void createBlocks(){
 
 				for (int i = 0; i < instants.Count; i++) {
-						GameObject obj = Instantiate (Resources.Load("Segment")) as GameObject;
-						obj.transform.parent = transform.parent.FindChild("Segments");
-//						Segment s = obj.GetComponent<Segment> ();
-						Segment s = obj.AddComponent<Segment> ();// new Segment(audioSource,instants [i - 1], instants [i]));
-						obj.transform.localPosition = Utils.Utils.circle (i, instants.Count,.15f);
+						GameObject obj =Instantiate (Resources.Load("Segment")) as GameObject;
+						obj.transform.parent = transform;
+						Segment s = obj.AddComponent<Segment> ();
+						obj.transform.localPosition = Utils.Utils.circle (i, instants.Count,.45f);
 						s.begin = instants [i].x;
 						s.end = instants [i].y;
 						s.audio = this;
@@ -128,16 +127,20 @@ public class audioSlicer : MonoBehaviour {
 
 		}
 
-		void OnMouseEnter(){
-				//print (name);
-				GuiUtils.displayMe (transform.parent.gameObject);
-
+//		void OnMouseEnter(){
+//				print (name);
+//				GuiUtils.displayMe (transform.parent.gameObject);
+//
+//		}
+//
+//		void OnMouseExit(){
+//				//print("out");
+//				GuiUtils.hideMe (transform.parent.gameObject);
+//		}
+		public void hover(bool t){
+				if(t)GuiUtils.displayMe (transform.gameObject);
+				else GuiUtils.hideMe (transform.gameObject);
+			
 		}
-
-		void OnMouseExit(){
-				//print("out");
-				GuiUtils.hideMe (transform.parent.gameObject);
-		}
-
 
 }

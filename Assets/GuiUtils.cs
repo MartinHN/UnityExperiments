@@ -14,15 +14,82 @@ public class GuiUtils : MonoBehaviour {
 		static float fadeOut = 1;
 		static float fadeIn=1;
 		public static Transform refTransform;
+		GameObject hovered;
+		GameObject dragged;
+
+		int dragMask;
+		int hoverMask;
+		int clickMask;
+		bool clicked=false;
+		bool onClick = false;
+
 		// Use this for initialization
 	void Start () {
 				texts = new Dictionary<GameObject,GameObject> ();
 				refTransform = Camera.main.transform;
-
+				hovered = null;
+				dragged = null;
+				dragMask =  1<<LayerMask.NameToLayer ("Songs");
+				hoverMask = 1<<LayerMask.NameToLayer("Songs");
+				clickMask = 1<< LayerMask.NameToLayer("Segments");
 	}
 	
 	// Update is called once per frame
 	void Update () {
+				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+				RaycastHit hit;
+				if (onClick)
+						onClick = false;
+				if (Input.GetMouseButtonDown (0) && !clicked){
+						onClick = true;
+						clicked = true;
+					}
+				if (Input.GetMouseButtonUp (0)) {
+						clicked = false;
+				}
+
+				//clickMask
+				if( onClick && Physics.Raycast(ray,out hit ,Mathf.Infinity, clickMask))
+				{
+								hit.collider.transform.GetComponent<Segment> ().clickAction();
+				}
+//				hover
+				if (Physics.Raycast (ray, out hit, Mathf.Infinity, hoverMask) ) {
+				
+						if (hovered != hit.collider.transform.gameObject) {
+								if (hovered != null)
+										hovered.GetComponent<audioSlicer> ().hover (false);
+								hovered = hit.collider.transform.gameObject;
+								hovered.GetComponent<audioSlicer> ().hover (true);
+								
+						}
+
+				}
+
+				else {
+						if (hovered != null) {
+								hovered.GetComponent<audioSlicer> ().hover (false);
+								hovered = null;
+						}
+				}
+				// drag
+				if ( Physics.Raycast (ray, out hit, Mathf.Infinity, dragMask)) {
+						if(onClick )
+								dragged = hit.collider.transform.gameObject;
+
+				} 
+
+				if ( dragged != null) {
+						if (clicked) {
+								dragged.transform.position = Camera.main.ScreenToWorldPoint (Input.mousePosition - transform.position);//Vector3.Slerp (dragged.transform.position, Camera.main.ScreenToWorldPoint (Input.mousePosition-transform.position), .5f);
+
+						} else {
+								dragged = null;
+						}
+				}
+			
+								
+
 	
 	}
 

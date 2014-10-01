@@ -10,7 +10,7 @@ public class AudioLoader : MonoBehaviour {
 
 
 		Dictionary<string,audioMeta> dict;
-		List<audioSlicer> aslL;
+	
 		Vector3 lastMP;
 		float radius = 1;
 		float audioUpdateTime = 0.5f;
@@ -40,7 +40,7 @@ public class AudioLoader : MonoBehaviour {
 				}
 				assL = new List<audioSlicer> ();
 				int idx = 0;
-				int maxnum = 10;
+				int maxnum = 2;
 				int numinst = Mathf.Min (maxnum, dict.Count);
 				float gridsize=5;
 				float side = gridsize / (Mathf.Sqrt (numinst));
@@ -48,41 +48,77 @@ public class AudioLoader : MonoBehaviour {
 				Segment.rout = side / (2.0f);
 				gridsize -= Segment.rout;
 				foreach (string n in dict.Keys) {
-						GameObject go = Instantiate(Resources.Load("SongContainer"),Utils.Utils.grid(idx,numinst,gridsize),Quaternion.LookRotation(transform.TransformDirection(Vector3.forward))) as GameObject;
+						GameObject go = Instantiate(Resources.Load("Song"),Utils.Utils.grid(idx,numinst,gridsize),Quaternion.LookRotation(transform.TransformDirection(Vector3.forward))) as GameObject;
 						go.name = "song : "+n;			
-						audioSlicer asl = go.GetComponentInChildren<audioSlicer> ();
+						audioSlicer asl = go.GetComponent<audioSlicer> ();
 						asl.fname = n;
 						asl.annotationpath = dict [n].annotationpath;
 						asl.audiopath = dict [n].audiopath;
 						StartCoroutine(asl.LoadData());
-						asl.GetComponent<BoxCollider> ().size = new Vector3 (side, side,.06f);
-						asl.transform.localPosition += Vector3.forward * .06f;
+						asl.GetComponent<BoxCollider> ().size = new Vector3 (side/2, side/2,.1f);
+						//asl.transform.localPosition += Vector3.forward * .06f;
 						assL.Add (asl);
 								idx ++;
 						if (idx >= maxnum) break;
 				}
 
-		foreach (audioSlicer ass in assL)
-				{
-
-						for (int i = 0; i < 1; i++) {
-								GameObject go = new GameObject ();
-								go.name = "spring" + i;
-								//go.transform.parent = ass.transform.parent;
-								go.AddComponent<Rigidbody> ();
-								SpringJoint sj = go.AddComponent<SpringJoint> ();
-								sj.connectedBody = assL [Random.Range (0, assL.Count - 1)].transform.parent.rigidbody;
-						
-								FixedJoint fj = go.AddComponent<FixedJoint> ();
-								fj.connectedBody = ass.transform.parent.rigidbody;
-						}
-				}
 
 				lastMP = Input.mousePosition;
 
 
 	}
+
+
+		void makeSpring(ref ConfigurableJoint res,float spring){
+				//ConfigurableJoint res;
+				JointDrive jd = new JointDrive();
+				jd.mode =JointDriveMode.Position;
+				jd.positionSpring = spring;
+				jd.maximumForce = Mathf.Infinity;
+
+				res.xDrive=jd;
+				res.yDrive=jd;
+				res.zDrive=jd;
+
+
+
+
+
+
+
+		
+		}
+
 		void Start(){
+
+				foreach (audioSlicer ass in assL)
+				{
+						{
+								ConfigurableJoint sj = ass.transform.gameObject.AddComponent<ConfigurableJoint> ();
+								sj.connectedBody = null;
+								makeSpring (ref sj, 2);
+
+
+
+
+						}
+						for (int i = 0; i < 1; i++) {
+								Rigidbody r = assL [Random.Range (0, assL.Count - 1)].rigidbody;
+								if (r != ass.rigidbody) {
+										ConfigurableJoint sj = ass.gameObject.AddComponent<ConfigurableJoint> ();
+										sj.autoConfigureConnectedAnchor = false;
+										sj.connectedAnchor = Vector3.zero;
+
+										makeSpring (ref sj, 2);
+
+										sj.connectedBody = r;
+								} else {
+										print (ass.name);
+								}
+
+
+						}
+				}
 
 		}
 	// Update is called once per frame
