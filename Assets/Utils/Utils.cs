@@ -71,7 +71,7 @@ namespace Utils{
 //		}
 		
 				public static Vector3 circle(int idx,int total,float radius=1){
-						return Quaternion.AngleAxis(360.0f*idx/(total-1.0f),Vector3.forward)* Vector3.left*radius;
+						return Quaternion.AngleAxis(360.0f*idx/(total),Vector3.forward)* Vector3.left*radius;
 				}
 				public static Vector3 grid(int idx,int total,float size){
 						int num =(int) Mathf.Sqrt (total);

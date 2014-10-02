@@ -14,12 +14,11 @@ public class GuiUtils : MonoBehaviour {
 		static float fadeOut = 1;
 		static float fadeIn=1;
 		public static Transform refTransform;
-		GameObject hovered;
+		Interact hovered;
 		GameObject dragged;
 
-		int dragMask;
-		int hoverMask;
-		int clickMask;
+
+		int interactMask;
 		bool clicked=false;
 		bool onClick = false;
 
@@ -29,9 +28,9 @@ public class GuiUtils : MonoBehaviour {
 				refTransform = Camera.main.transform;
 				hovered = null;
 				dragged = null;
-				dragMask =  1<<LayerMask.NameToLayer ("Songs");
-				hoverMask = 1<<LayerMask.NameToLayer("Songs");
-				clickMask = 1<< LayerMask.NameToLayer("Segments");
+				interactMask =  1<<LayerMask.NameToLayer ("Songs");
+				interactMask |= 1<<LayerMask.NameToLayer("Segments");
+
 	}
 	
 	// Update is called once per frame
@@ -48,38 +47,38 @@ public class GuiUtils : MonoBehaviour {
 						clicked = false;
 				}
 
-				//clickMask
-				if( onClick && Physics.Raycast(ray,out hit ,Mathf.Infinity, clickMask))
-				{
-								hit.collider.transform.GetComponent<Segment> ().clickAction();
-				}
-//				hover
-				if (Physics.Raycast (ray, out hit, Mathf.Infinity, hoverMask) ) {
+				if (Physics.Raycast (ray, out hit, Mathf.Infinity, interactMask)) {
+						Interact ob = hit.collider.transform.GetComponent<Interact> ();
+						//clickMask
+						if (onClick)
+								ob.action0 ();
 				
-						if (hovered != hit.collider.transform.gameObject) {
+						//				hover
+
+				
+						if (hovered != ob) {
 								if (hovered != null)
-										hovered.GetComponent<audioSlicer> ().hover (false);
-								hovered = hit.collider.transform.gameObject;
-								hovered.GetComponent<audioSlicer> ().hover (true);
-								
+										hovered.onHover (false);
+								hovered = ob;
+								ob.onHover (true);
+
 						}
 
-				}
+						// drag
+						if (onClick && ob.isDraggable)
+										dragged = hit.collider.transform.gameObject;
 
+
+				}
+				//no Cast
 				else {
 						if (hovered != null) {
-								hovered.GetComponent<audioSlicer> ().hover (false);
+								hovered.onHover (false);
 								hovered = null;
 						}
 				}
-				// drag
-				if ( Physics.Raycast (ray, out hit, Mathf.Infinity, dragMask)) {
-						if(onClick )
-								dragged = hit.collider.transform.gameObject;
 
-				} 
-
-				if ( dragged != null) {
+				if (dragged != null) {
 						if (clicked) {
 								dragged.transform.position = Camera.main.ScreenToWorldPoint (Input.mousePosition - transform.position);//Vector3.Slerp (dragged.transform.position, Camera.main.ScreenToWorldPoint (Input.mousePosition-transform.position), .5f);
 
@@ -97,25 +96,36 @@ public class GuiUtils : MonoBehaviour {
 
 
 
-				destroyMe (go);
+				if (texts.ContainsKey (go)) {
+						List<Tweener> twl = HOTween.GetTweenersByTarget (texts [go].GetComponent<ObjectLabel> (), false);
+						foreach (Tweener tw in twl) {
+								tw.ResetAndChangeParms(TweenType.To,1,new TweenParms().Prop("color",textColor));
+						}
+
+//						Destroy (texts [go]);
+//						texts.Remove (go);
+				} else {
 						
 
 
-				GameObject goo = new GameObject() ;
-				goo.transform.parent = refTransform;
-				GUIText g = goo.AddComponent<GUIText> ();
-				g.color = textColor* new Vector4(1,1,1,0);
-				g.text = go.name;
-				g.pixelOffset = Camera.main.WorldToScreenPoint(go.transform.position);
+						GameObject goo = new GameObject ();
+						goo.transform.parent = go.transform;//refTransform;
+						ObjectLabel g = goo.AddComponent<ObjectLabel> ();
+						g.gameObject.transform.localPosition = Vector3.zero;
+					//	g.anchor = TextAnchor.MiddleCenter;
+						g.color = textColor * new Vector4 (1, 1, 1, 0);
+						g.text = go.name;
+						//g.pixelOffset = Camera.main.WorldToScreenPoint (go.transform.position);
 
-				HOTween.To (g, fadeIn, "color", textColor);
-				texts.Add (go,goo);
+						HOTween.To (g, fadeIn, "color", textColor);
+						texts.Add (go, goo);
+				}
 
 
 		}
 	public static void hideMe(GameObject go){
 				if (texts.ContainsKey (go))
-				{HOTween.To (texts [go].GetComponent<GUIText> (), fadeOut, new TweenParms ().Prop ("color", textColor * new Vector4 (1, 1, 1, 0)).OnComplete (destroyMe, go));}
+				{HOTween.To (texts [go].GetComponent<ObjectLabel> (), fadeOut, new TweenParms ().Prop ("color", textColor * new Vector4 (1, 1, 1, 0)).OnComplete (destroyMe, go));}
 
 		}
 
@@ -129,7 +139,7 @@ public class GuiUtils : MonoBehaviour {
 
 		static void destroyMe(GameObject go){
 				if (texts.ContainsKey (go)) {
-						List<Tweener> twl =HOTween.GetTweenersByTarget(texts [go].GetComponent<GUIText> (),false);
+						List<Tweener> twl =HOTween.GetTweenersByTarget(texts [go].GetComponent<ObjectLabel> (),false);
 						foreach (Tweener tw in twl) {tw.Kill ();}
 						Destroy (texts [go]);
 						texts.Remove (go);
