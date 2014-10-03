@@ -73,11 +73,19 @@ namespace Utils{
 				public static Vector3 circle(int idx,int total,float radius=1){
 						return Quaternion.AngleAxis(360.0f*idx/(total),Vector3.forward)* Vector3.left*radius;
 				}
+
 				public static Vector3 grid(int idx,int total,float size){
 						int num =(int) Mathf.Sqrt (total);
 						float step = size/(num);
 
 						return Vector3.left * ((idx/num-(num-1)/2.0f)*step) + Vector3.up * step* ((idx % num)-(num-1)/2.0f);
+				}
+
+				public static Vector3 cube(int idx,int total,float size){
+						int num =(int) Mathf.Pow (total,1/3.0f);
+						float step = size/(num);
+
+						return Vector3.left * ((idx/num-(num-1)/2.0f)*step) + Vector3.up * step* ((idx % num)-(num-1)/2.0f) + Vector3.forward* ((int)(idx/(num*num))*step);
 				}
 
 				public static Mesh  arc(float rin,float rout,Vector2 deg,float thick = 1){

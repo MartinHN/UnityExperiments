@@ -6,8 +6,8 @@ using Holoville.HOTween;
 
 
 public class Container : Interact {
-		public List<Container> childs;
-		public Container container;
+//		public List<Container> childs;
+//		public Container container;
 		int _level;
 		public bool displayName=true;
 		public float begin;
@@ -20,7 +20,8 @@ public class Container : Interact {
 
 	// Use this for initialization
 	void Start () {
-				childs = new List<Container> ();
+
+				//childs = new List<Container> ();
 
 	}
 	
@@ -31,23 +32,29 @@ public class Container : Interact {
 	}
 
 		public List<Container> getSiblings(){
-				if (level == 0)
-						return null;
-				List<Container> res= new List<Container>();
-				foreach(Container c in container.childs){
-						res.AddRange(c.childs);
+
+				List<Container> childs = new List<Container> ();
+				for(int i = 0; i < transform.parent.childCount; i++){
+						childs.Add(transform.parent.GetChild(i).GetComponent<Container>());
 				}
-				return res;
+				return childs;
 		}
 
-		public List<Container> getLevel(int l){
-				List<Container> res = new List<Container> ();
-				if (level == l - 1)
-						return childs;
+		public void getLevel(int l, ref List<Container> res){
+				//List<Container> res = new List<Container> ();
+				List<Container> childs = new List<Container> ();
+				for(int i = 0; i < transform.childCount; i++){
+						childs.Add(transform.GetChild(i).GetComponent<Container>());
+				}
+		
+		if (level == l - 1)
+						res.AddRange( childs);
 				else{
 						foreach(Container c in childs){
-								res.AddRange (c.getLevel (l));
+								c.getLevel (l,ref res);
+								//res.AddRange (res);
 						}
+			
 				}
 		}
 
@@ -100,13 +107,22 @@ public class Container : Interact {
 				}
 		}
 
+		[SerializeField]
 	public int level {
 		get {
+
+
 			return _level;
 		}
 				set{
-						//gameObject.layer = 1<<LayerMask.NameToLayer (value.ToString ());
-						_level = value;
+					int i = 1;
+						Transform t = transform;
+						while (t.parent != ContainerHandler.rootContainer.transform && i < 10) {
+								t = transform.parent;
+
+						i++;
+					}						//gameObject.layer = 1<<LayerMask.NameToLayer (value.ToString ());
+						_level = i;
 				}
 	}
 
