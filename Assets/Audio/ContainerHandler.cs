@@ -6,6 +6,8 @@ public class ContainerHandler : MonoBehaviour {
 		[SerializeField]
 		public static Container rootContainer;
 		float fractalScale = .4f;
+		public static bool endLoad = false;
+
 	// Use this for initialization
 	void Awake () {
 				rootContainer = GetComponent<Container> ();
@@ -24,7 +26,7 @@ public class ContainerHandler : MonoBehaviour {
 
 
 				int idx = 0;
-				int maxnum = 50;
+				int maxnum = 5;
 				int numinst = Mathf.Min (maxnum, AudioLoader.dict.Count);
 				float gridsize=5;
 				float side = gridsize / (Mathf.Sqrt (numinst));
@@ -60,7 +62,7 @@ public class ContainerHandler : MonoBehaviour {
 						idx ++;
 						if (idx >= maxnum) break;
 				}
-				StartCoroutine (CreateSimilarities ());
+				StartCoroutine(CreateSimilarities ());
 
 	}
 
@@ -68,27 +70,36 @@ public class ContainerHandler : MonoBehaviour {
 		public IEnumerator CreateSimilarities(){
 				List<Container> co = new List<Container>();
 				rootContainer.getLevel (2,ref co);
+
 				int stackIdx = 0;
+				int count = 0;
 				Dictionary<Container,float> dest = new Dictionary<Container,float> ();
 
-				for(int i = 0 ; i  < co.Count-1;i++){
+				for(int i = 0 ; i  < co.Count;i++){
 						Container c = co [i];
-						dest.Clear ();
+
+
 						for(int j = i+1 ; j < co.Count;j++){
-								Container c2 = co [j];
-								if(c2!=c){float l0 = Random.Range (0, 10);
-//										stackIdx++;
-//										if (stackIdx > 40000)
-//												stackIdx = 0;
-//												yield return null;
-										if (l0 < 5)
-												dest [c2] = l0;
+
+								if(co[j]!=c){float l0 = Random.Range (1, 9);
+
+//										if (l0 < 2)
+										dest [co[j]] = l0;
 								}
 						}
-						Spring.makeSpring (c, dest, 1, false);
-						print ("lala");
+
+						yield return null;
+						print (count++);
+						Spring.instance.makeSpring (c, dest, 1, false);
+						print ("fin");
+						yield return null;
+
+
 				}
+				Spring.instance.ResizeVal ();
+				endLoad = true;;
 				yield return null;
+			
 		}
 
 
@@ -119,7 +130,7 @@ public class ContainerHandler : MonoBehaviour {
 						c.end = i.y;
 						c.isDraggable = true;
 
-						Spring.makeSpring (c, pa.GetComponent<Container> (),  1,radius);
+						//Spring.makeSpring (c, pa.GetComponent<Container> (),  1,radius);
 
 						c.isPlaying = false;
 						c.level = 2;
@@ -129,13 +140,31 @@ public class ContainerHandler : MonoBehaviour {
 
 				}
 
-				List<Container> cc = pa.GetChild (0).GetComponent<Container> ().getSiblings();
-				float cScale = pa.GetChild(0).lossyScale.magnitude ; 
-//				print (cc);
-				for (int i = 0; i < cc.Count; i++) {
-						Spring.makeSpring (cc[(i+1)%(cc.Count)],cc[i], 1,  2*radius* Mathf.Sin (anglestep/2));
-
-				}
+//				List<Container> cc = pa.GetChild (0).GetComponent<Container> ().getSiblings();
+//				float cScale = pa.GetChild(0).lossyScale.magnitude ; 
+////				print (cc);
+//				for (int i = 0; i < cc.Count; i++) {
+//						Spring.makeSpring (cc[(i+1)%(cc.Count)],cc[i], 1,  2*radius* Mathf.Sin (anglestep/2));
+//
+//				}
 		
+		}
+
+
+
+	
+	public float simSpring {
+		get {
+						return Spring.spring;
+		}
+				set{
+
+						Spring.spring=value;
+				}
+	}
+
+		void OnGUI(){
+				Spring.spring = GUI.HorizontalSlider (new Rect (0, 0, 100, 100), Spring.spring, 0, 10);
+
 		}
 }
