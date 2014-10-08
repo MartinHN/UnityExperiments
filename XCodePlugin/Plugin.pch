@@ -1,0 +1,79 @@
+#define MINFLOAT 0.000001
+
+
+extern "C" {
+
+    typedef struct Vector3 {
+        float x,y,z;
+        
+        Vector3(){}
+
+        
+        Vector3(float xin,float yin , float zin){
+            x = xin;
+            y = yin;
+            z = zin;
+        }
+        Vector3 operator + (Vector3 v){
+            return Vector3(x+v.x,y+v.y,z+v.z);
+        }
+        void operator += (Vector3 v){
+            x+=v.x;
+            y+=v.y;
+            z+=v.z;
+        }
+        void operator*= (Vector3 v){
+            x*=v.x;
+            y*=v.y;
+            z*=v.z;
+        }
+        void operator*= (float v){
+            x*=v;
+            y*=v;
+            z*=v;
+        }
+        Vector3 operator - (Vector3 v){
+            return Vector3(x-v.x,y-v.y,z-v.z);
+            
+        }
+        Vector3 operator * (Vector3 v){
+            return Vector3(x*v.x,y*v.y,z*v.z);
+            
+        }
+        Vector3 operator * (float v){
+            return Vector3(x*v,y*v,z*v);
+            
+        }
+        
+        Vector3 operator / (Vector3 v){
+            return Vector3(x/v.x,y/v.y,z/v.z);
+        }
+        Vector3 operator / (float v){
+            return Vector3(x/MAX(MINFLOAT,v),y/MAX(MINFLOAT,v),z/MAX(MINFLOAT,v));
+        }
+        void operator = (Vector3 v){
+            x=v.x;
+            y=v.y;
+            z=v.z;
+            
+        }
+        
+        float mag(){
+            return MAX(MINFLOAT,(x*x+y*y+z*z));
+        }
+
+        
+        
+        
+    }Vector3;
+    
+
+    
+
+    
+    void addElement(int id1,int id2,float sim);
+	void updatePhysics(Vector3* pos,int size,float deltaTime);
+    void resize(int max);
+    void destroydata();
+    void setSpring(float k);
+}
