@@ -26,7 +26,7 @@ public class ContainerHandler : MonoBehaviour {
 
 
 				int idx = 0;
-				int maxnum = 5;
+				int maxnum = 500;
 				int numinst = Mathf.Min (maxnum, AudioLoader.dict.Count);
 				float gridsize=5;
 				float side = gridsize / (Mathf.Sqrt (numinst));
@@ -73,12 +73,13 @@ public class ContainerHandler : MonoBehaviour {
 
 				int stackIdx = 0;
 				int count = 0;
-				Dictionary<Container,float> dest = new Dictionary<Container,float> ();
+				int batch = 160;
+
 
 				for(int i = 0 ; i  < co.Count;i++){
 						Container c = co [i];
 
-
+						Dictionary<Container,float> dest = new Dictionary<Container,float> ();
 						for(int j = i+1 ; j < co.Count;j++){
 
 								if(co[j]!=c){float l0 = Random.Range (1, 9);
@@ -86,17 +87,25 @@ public class ContainerHandler : MonoBehaviour {
 //										if (l0 < 2)
 										dest [co[j]] = l0;
 								}
+
+								if(count++>batch){
+										stackIdx++;
+										count = 0;
+										print(stackIdx*batch*1.0f/(co.Count*co.Count));
+										yield return new WaitForSeconds(.1f);
+								}
+
 						}
 
-						yield return null;
-						print (count++);
+//						yield return null;//new WaitForSeconds(.5f);
+//						print (count++);
 						Spring.instance.makeSpring (c, dest, 1, false);
-						print ("fin");
-						yield return null;
+//						print ("fin");
+						yield return null;//new WaitForSeconds(.5f);
 
 
 				}
-				Spring.instance.ResizeVal ();
+
 				endLoad = true;;
 				yield return null;
 			
@@ -163,8 +172,8 @@ public class ContainerHandler : MonoBehaviour {
 				}
 	}
 
-		void OnGUI(){
-				Spring.spring = GUI.HorizontalSlider (new Rect (0, 0, 100, 100), Spring.spring, 0, 10);
-
-		}
+//		void OnGUI(){
+//				Spring.spring = GUI.HorizontalSlider (new Rect (0, 0, 100, 100), Spring.spring, 0, 10);
+//
+//		}
 }
